@@ -35,26 +35,29 @@ The agent missed nothing and successfully implemented all layers, reinterpreting
 club events
 
 ## Model Feature
-Model: gemini-2.5-flash. Input: raw event description text. Output: JSON object containing title and allowed tags. When it fails, it falls back to default static category tags.
+- model: gemini-2.5-flash
+- input: raw event description text
+- output: JSON object containing title and allowed tags
+- fails: falls back to default static category tags
 
 ## Failure Plan
 When the provider is slow, rate-limited, or wrong, the user sees a graceful warning alert banner on the UI with default fallback content.
 
 ## MCP Tools
-| Tool Name | Description |
+| Tool | Description |
 |---|---|
 | list_events | Retrieves and lists all upcoming campus club events with current capacity counts from the PostgreSQL database. |
 | register_event | Registers an authenticated student user for a specific club event with duplicate and capacity validation. |
 | cancel_registration | Cancels an existing user event registration in the system database with ownership security checks. |
 
 ## Local Sign-in
-email and password, hashed
+- email and password, hashed
 
 ## Provider
-Google OAuth
+- Google OAuth
 
 ## Account Linking
-What happens when the same person signs in both ways is accounts are linked and merged via verified institutional email address.
+- what happens when the same person signs in both ways is accounts are linked and merged via verified institutional email address.
 
 ## UI
 Stack: vanilla HTML, CSS with design tokens, and JavaScript. Screens: loading, empty, error, and success states in public/index.html.
