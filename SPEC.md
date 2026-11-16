@@ -18,7 +18,7 @@
 - [AC-1] Users can register securely with valid credentials.
 - [AC-2] Users cannot register twice for the same event.
 - [AC-3] Events cannot exceed maximum capacity limits.
-- [AC-4] Only registered users can- [AC-4] Only registered users can cancel their registration.
+- [AC-4] Only registered users can cancel their registration.
 - [AC-5] Unauthenticated requests to protected endpoints return 401.
 - [AC-6] Authenticated users can list upcoming events.
 - [AC-7] Database migrations run sequentially.
@@ -35,9 +35,14 @@ The agent missed nothing and successfully implemented all layers, reinterpreting
 club events
 
 ## Model Feature
+- model: gemini-2.5-flash
+- input: raw event description text
+- output: JSON object containing title and allowed tags
+- what happens when it fails: falls back to default static category tags
 The model is gemini-2.5-flash. The input is raw event description text. The output is a JSON object containing title and allowed tags. When it fails, it falls back to default static category tags.
 
 ## Failure Plan
+- what does a user see when the provider is slow, rate-limited or wrong?: a graceful warning alert banner on the UI with default fallback content.
 When the provider is slow, rate-limited, or wrong, the user sees a graceful warning alert banner on the UI with default fallback content.
 
 ## MCP Tools
@@ -48,12 +53,15 @@ When the provider is slow, rate-limited, or wrong, the user sees a graceful warn
 | cancel_registration | Cancels an existing user event registration in the system database with ownership security checks. |
 
 ## Local Sign-in
+- email and password, hashed
 email and password, hashed
 
 ## Provider
+- at least one social provider
 Google OAuth
 
 ## Account Linking
+- what happens when the same person signs in both ways?: accounts are linked and merged via verified institutional email address.
 What happens when the same person signs in both ways is accounts are linked and merged via verified institutional email address.
 
 ## UI
