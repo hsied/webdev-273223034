@@ -29,24 +29,30 @@ describe('ClubService Comprehensive Acceptance Tests', () => {
 
   it('[AC-10] AI draft generator returns validated title and allowed tags', async () => {
     const fakeAi = async () => ({
-      title: 'Generated Workshop Title',
-      summary: 'Summary text',
-      tags: ['workshop']
+      title: 'Rust Workshop',
+      summary: 'Learn Rust backend development.',
+      tags: ['workshop'],
+      fallbackUsed: false
     });
+    
     const service = new ClubService(null, fakeAi);
-    const result = await service.draftEventCopy('user-1', 'Python coding idea');
-    expect(result.title).toBe('Generated Workshop Title');
-    expect(result.tags).toContain('workshop');
+    const draft = await service.draftEventCopy('user-1', 'rust workshop');
+    
+    expect(draft.title).toBe('Rust Workshop');
+    expect(draft.tags).toContain('workshop');
+    expect(draft.fallbackUsed).toBe(false);
   });
 
   it('[AC-11] AI draft generator enforces fallback when model fails', async () => {
     const fakeAiFail = async () => {
       throw new Error('Rate limited');
     };
+    
     const service = new ClubService(null, fakeAiFail);
-    const result = await service.draftEventCopy('user-1', 'Fallback idea');
-    expect(result.fallbackUsed).toBe(true);
-    expect(result.fallbackReason).toBe('Rate limited');
+    const draft = await service.draftEventCopy('user-1', 'rust workshop');
+    
+    expect(draft.fallbackUsed).toBe(true);
+    expect(draft.fallbackReason).toBe('Rate limited');
   });
 
   it('AI draft generator handles null modelClient gracefully', async () => {
