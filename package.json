@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "node src/server.js",
     "mcp": "node mcp-server/server.js",
-    "test": "vitest run"
+    "test": "npx vitest run"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "latest",
