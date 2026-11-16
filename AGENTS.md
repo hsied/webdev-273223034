@@ -3,22 +3,21 @@
 Read this file at the start of every session. Keep it short and correct; update it when the project changes.
 
 ## Project
-<!-- One or two sentences: what the app does and for whom. Link SPEC.md. -->
+Build a club events management system where student clubs publish capacity-limited events and students register, browse, and cancel registrations.
 See `SPEC.md` for goals, non-goals and acceptance criteria.
 
 ## Commands
-<!-- How to install, run, test. Keep these exact and working. -->
-- Install: 
-- Run: 
-- Test: 
-- Coverage: 
-- MCP server: 
+- Install: `npm install`
+- Run: `npm run dev`
+- Test: `npm test`
+- Coverage: `npm test -- --coverage`
+- MCP server: `npm run mcp`
 
 ## Conventions
-<!-- Folder layout, naming, where business rules live, how errors are returned to the client. -->
+- Folder layout: `src/routes/` (HTTP), `src/services/` (Business logic), `src/db/` (Database & migrations), `mcp-server/` (MCP), `public/` (Frontend).
+- Business rules and database queries return standardized errors and use async/await.
 
 ## Layers
-<!-- Fill in the file or folder for each layer. -->
 Requests arrive two ways and both end in the same place:
 
 - HTTP route handler → service → data access → database
@@ -29,15 +28,13 @@ rules and knows nothing about HTTP or about MCP. Only the data layer writes SQL.
 that talks to the database directly is a second, unguarded way into your data: never add one.
 
 ## The model feature
-<!-- Provider, env var, and the call site. -->
-- The provider is named in exactly one file: 
-- The key comes from an environment variable and is never committed or logged.
-- Every call has a timeout and a deterministic fallback, so the app still works when the provider is down or rate-limited.
+- The provider is named in exactly one file: `src/ai/modelClient.js` (Google Gemini API, `gemini-2.5-flash`).
+- The key comes from an environment variable (`GEMINI_API_KEY`) and is never committed or logged.
+- Every call has a timeout (4000ms) and a deterministic fallback, so the app still works when the provider is down or rate-limited.
 - The model's output is re-checked against real data before anything is saved or shown.
 - Tests never call the provider: they pass in a fake client.
 
 ## The MCP server
-<!-- Where it lives and how it authenticates. -->
 - Lives in `mcp-server/`, grew out of Exercise 1.
 - Every tool calls a service function; none touches the data layer or the database directly.
 - It carries a user, and enforces exactly the same authorization rules as the HTTP API.
