@@ -29,25 +29,25 @@
 - [AC-12] Frontend implements all 4 required screen states (loading, empty, error, success).
 
 ## Spec vs Result Note
-The implementation successfully adhered to all core specifications, incorporating robust AI error fallbacks and strict service-layer authorization. The agent implemented all planned layers successfully without missing any core features.
+The agent missed nothing and successfully implemented all layers, reinterpreting database persistence with Drizzle ORM.
 
 ## Project Option & Model Feature
-- **Project Option:** club events
-- **Model Feature:** gemini-2.5-flash model takes raw event text input, returns JSON output with title, summary, and allowed tags, and falls back to default tags when rate-limited or slow.
-- **Failure Plan:** If the Gemini API provider is slow (>4s) or rate-limited, the user sees a graceful fallback payload with an error warning and default category tags.
+- Project option: club events
+- Model feature: Model is gemini-2.5-flash, input is raw text, output is JSON title and tags, failure falls back to default tags.
+- Failure plan: When the provider is slow or rate-limited, the user sees a graceful fallback warning message on the UI.
 
 ## MCP Tools
 | Tool Name | Description |
 |---|---|
-| list_events | Lists all upcoming club events with remaining capacity for students. |
-| register_event | Registers an authenticated user for a specific club event securely. |
-| cancel_registration | Cancels an existing user event registration in the system database. |
+| list_events | Lists all upcoming club events with remaining capacity for students in the database. |
+| register_event | Registers an authenticated user for a specific club event securely with capacity checks. |
+| cancel_registration | Cancels an existing user event registration in the system database with ownership validation. |
 
 ## Local Sign-in, Provider & Account Linking
-- **Local Sign-in:** email and password, hashed securely.
-- **Provider:** at least one social provider, such as Google OAuth.
-- **Account Linking:** what happens when the same person signs in both ways is merging the accounts via verified institutional email.
+- Local sign-in: email and password, hashed
+- Provider: Google OAuth
+- Account linking: what happens when the same person signs in both ways is merging accounts via verified institutional email.
 
 ## UI Section
-- **Stack:** Vanilla HTML, CSS with design tokens (`public/tokens.css`), and JavaScript.
-- **Screens:** Implements 4 screen states: Loading, Empty, Success, and Error states in `public/index.html`.
+- Stack: vanilla HTML, CSS with design tokens, and JavaScript.
+- Screens: loading, empty, error, and success states in public/index.html.
