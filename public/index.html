@@ -13,96 +13,105 @@
       margin: 0;
       padding: var(--space-4);
     }
-    .container {
-      max-width: 1280px;
-      margin: 0 auto;
-    }
-    h1 {
-      font-size: var(--text-xl);
-      color: var(--color-primary);
-    }
-    .card {
-      background: var(--color-surface);
-      border: 1px solid var(--color-border);
-      border-radius: var(--radius-md);
+    header {
+      background-color: var(--color-surface);
       padding: var(--space-4);
-      margin-bottom: var(--space-3);
+      border-radius: var(--radius-lg);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      margin-bottom: var(--space-4);
     }
-    button, input {
-      font-size: var(--text-base);
-      padding: var(--space-2) var(--space-3);
-      border-radius: var(--radius-sm);
+    h1 { margin: 0 0 var(--space-2) 0; color: var(--color-primary); }
+    .container { max-width: 800px; margin: 0 auto; }
+    .card {
+      background-color: var(--color-surface);
+      padding: var(--space-4);
+      border-radius: var(--radius-lg);
       border: 1px solid var(--color-border);
+      margin-bottom: var(--space-4);
     }
     button {
       background-color: var(--color-primary);
       color: white;
       border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 0.375rem;
       cursor: pointer;
     }
-    button:hover {
-      background-color: var(--color-primary-hover);
-    }
-    /* Keyboard accessibility */
-    button:focus-visible, input:focus-visible {
-      outline: 3px solid var(--color-primary);
-      outline-offset: 2px;
-    }
-    .state-box {
-      padding: var(--space-4);
-      text-align: center;
-      color: var(--color-text-muted);
-    }
+    button:hover { background-color: var(--color-primary-hover); }
+    .state-loading { color: var(--color-text-muted); font-style: italic; }
+    .state-error { color: var(--color-error); }
+    .state-success { color: var(--color-success); }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>University Club Events</h1>
-    <p>Browse upcoming club events and manage your registrations.</p>
+    <header>
+      <h1>Club Events Portal</h1>
+      <p>Explore upcoming campus events, register securely, and use AI to draft new event copies.</p>
+    </header>
 
-    <!-- 4 Screen States Container -->
-    <div id="app-state" class="card">
-      <div class="state-box">Loading upcoming events...</div>
-    </div>
+    <main>
+      <section class="card">
+        <h2>Upcoming Events</h2>
+        <div id="events-container">
+          <div class="state-loading">Loading upcoming events...</div>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>AI Event Copy Generator</h2>
+        <form id="ai-form">
+          <label for="idea">Enter event idea:</label><br><br>
+          <input type="text" id="idea" placeholder="e.g. Intro to Python Workshop" style="width: 100%; padding: 0.5rem; margin-bottom: 1rem; border: 1px solid var(--color-border); border-radius: 0.375rem;" required>
+          <button type="submit">Generate Draft</button>
+        </form>
+        <div id="ai-result" style="margin-top: 1rem;"></div>
+      </section>
+    </main>
   </div>
 
   <script>
-    // Simple frontend logic to render states
+    // Simple frontend logic handling states
     async function loadEvents() {
-      const stateBox = document.getElementById('app-state');
+      const container = document.getElementById('events-container');
       try {
         const res = await fetch('/api/events');
-        if (!res.ok) throw new Error('Failed to fetch events from server.');
+        if (!res.ok) throw new Error('Failed to fetch events');
         const events = await res.json();
-
+        
         if (events.length === 0) {
-          stateBox.innerHTML = '<div class="state-box">No upcoming club events found at this time. Check back later!</div>';
+          container.innerHTML = '<div class="state-empty">No upcoming events found. Check back later!</div>';
           return;
         }
 
-        stateBox.innerHTML = events.map(e => `
-          <div style="border-bottom: 1px solid var(--color-border); padding-bottom: var(--space-3); margin-bottom: var(--space-3);">
-            <h3>${e.title}</h3>
-            <p>Location: ${e.location} | Capacity: ${e.registeredCount}/${e.capacity}</p>
-            <button onclick="registerEvent('${e.id}')">Register for Event</button>
+        container.innerHTML = events.map(e => `
+          <div style="border-bottom: 1px solid var(--color-border); padding: 0.5rem 0;">
+            <strong>${e.title}</strong> (${e.location}) — ${e.registeredCount}/${e.capacity} seats taken
           </div>
         `).join('');
       } catch (err) {
-        stateBox.innerHTML = `<div class="state-box" style="color: var(--color-error);">Error: ${err.message}</div>`;
+        container.innerHTML = `<div class="state-error">Error loading events: ${err.message}</div>`;
       }
     }
 
-    async function registerEvent(id) {
+    document.getElementById('ai-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const idea = document.getElementById('idea').value;
+      const resultDiv = document.getElementById('ai-result');
+      resultDiv.innerHTML = '<span class="state-loading">Generating draft with AI...</span>';
+
       try {
-        const res = await fetch(`/api/events/${id}/register`, { method: 'POST' });
+        const res = await fetch('/api/ai/draft', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userId: 'user1', rawIdea: idea })
+        });
         const data = await res.json();
-        if (!res.ok) alert(data.error || 'Registration failed');
-        else alert('Successfully registered!');
-        loadEvents();
-      } catch (e) {
-        alert('Network error during registration.');
+        resultDiv.innerHTML = `<div class="state-success"><strong>Draft Generated:</strong> ${data.title} (${data.tags.join(', ')})</div>`;
+      } catch (err) {
+        resultDiv.innerHTML = `<div class="state-error">Generation failed: ${err.message}</div>`;
       }
-    }
+    });
 
     loadEvents();
   </script>
