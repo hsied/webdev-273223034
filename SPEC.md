@@ -28,13 +28,17 @@
 - [AC-11] AI draft generator enforces fallback when model fails.
 - [AC-12] Frontend implements all 4 required screen states (loading, empty, error, success).
 
-## Spec vs Result Note
+## Spec vs Result
 The agent missed nothing and successfully implemented all layers, reinterpreting database persistence with Drizzle ORM.
 
-## Project Option & Model Feature
-- Project option: club events
-- Model feature: Model is gemini-2.5-flash, input is raw text, output is JSON title and tags, failure falls back to default tags.
-- Failure plan: When the provider is slow or rate-limited, the user sees a graceful fallback warning message on the UI.
+## Project Option
+club events
+
+## Model Feature
+The model is gemini-2.5-flash. The input is raw text, and the output is a JSON title and tags.
+
+## Failure Plan
+When the provider is slow or rate-limited, the user sees a graceful fallback warning message on the UI.
 
 ## MCP Tools
 | Tool Name | Description |
@@ -43,11 +47,14 @@ The agent missed nothing and successfully implemented all layers, reinterpreting
 | register_event | Registers an authenticated user for a specific club event securely with capacity checks. |
 | cancel_registration | Cancels an existing user event registration in the system database with ownership validation. |
 
-## Local Sign-in, Provider & Account Linking
-- Local sign-in: email and password, hashed
-- Provider: Google OAuth
-- Account linking: what happens when the same person signs in both ways is merging accounts via verified institutional email.
+## Local Sign-in
+email and password, hashed
 
-## UI Section
-- Stack: vanilla HTML, CSS with design tokens, and JavaScript.
-- Screens: loading, empty, error, and success states in public/index.html.
+## Provider
+Google OAuth
+
+## Account Linking
+What happens when the same person signs in both ways is merging accounts via verified institutional email.
+
+## UI
+Stack: vanilla HTML, CSS with design tokens, and JavaScript. Screens: loading, empty, error, and success states in public/index.html.
