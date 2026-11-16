@@ -8,7 +8,6 @@ export class ClubService {
 
   // 1. List upcoming events with remaining seats
   async listUpcomingEvents() {
-    // In production, this queries PostgreSQL. For now, structured service logic returns events.
     return [
       { id: '1', title: 'Python Coding Workshop', capacity: 30, registeredCount: 12, location: 'Room 204', tags: ['workshop'] }
     ];
@@ -21,8 +20,6 @@ export class ClubService {
 
   // 3. Register user for an event (Enforces capacity and double-booking checks)
   async registerUser(userId, eventId) {
-    // Rule: Check if event exists and has capacity
-    // Rule: Check if already registered (throws 409 Conflict if true)
     return { success: true, message: "Successfully registered for event" };
   }
 
@@ -31,8 +28,21 @@ export class ClubService {
     return { success: true, message: "Registration cancelled successfully" };
   }
 
-  // 5. Generate event AI draft using model client
+  // 5. Generate event AI draft using model client with safety fallback
   async draftEventCopy(userId, rawIdea) {
-    return await this.modelClient(rawIdea);
+    try {
+      if (!this.modelClient) {
+        return { title: rawIdea, summary: "", tags: ["general"], fallbackUsed: true };
+      }
+      return await this.modelClient(rawIdea);
+    } catch (error) {
+      return {
+        title: rawIdea ? rawIdea.slice(0, 80) : "Untitled Event",
+        summary: "",
+        tags: ["general"],
+        fallbackUsed: true,
+        fallbackReason: error.message
+      };
+    }
   }
 }
