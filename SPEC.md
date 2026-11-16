@@ -28,19 +28,19 @@
 - [AC-12] Frontend implements all 4 required screen states (loading, empty, error, success).
 
 ## Spec vs Result Note
-The initial specification correctly anticipated core entity relationships. The implementation adhered strictly to these specs, successfully incorporating robust error fallbacks for the AI client and strict service-layer authorization.
+The implementation successfully adhered to all core specifications, incorporating robust AI error fallbacks and strict service-layer authorization.
 
 ## Project Option & Model Feature
 - **Project Option:** Club Events
 - **Model Feature:** AI Event Copy Draft Generator (`src/ai/modelClient.js`)
-- **Failure Plan:** If the Gemini API times out (>4s) or throws a rate-limit error, catch the exception, log the warning, and return a graceful fallback payload using the raw idea string with default tags.
+- **Failure Plan:** If the Gemini API times out or fails, catch the exception and return a graceful fallback payload.
 
 ## MCP Tools
-| Tool Name | Description | Parameters |
-|---|---|---|
-| `list_events` | Lists all upcoming club events with remaining capacity. | None |
-| `register_event` | Registers an authenticated user for a specific club event. | `userId`, `eventId` |
-| `cancel_registration` | Cancels an existing user event registration. | `userId`, `eventId` |
+| Tool | Description |
+|---|---|
+| `list_events` | Lists all upcoming club events with remaining capacity. |
+| `register_event` | Registers an authenticated user for a specific club event. |
+| `cancel_registration` | Cancels an existing user event registration. |
 
 ## Local Sign-in, Provider & Account Linking
 - **Local Sign-in:** Supported via Express session/token headers.
