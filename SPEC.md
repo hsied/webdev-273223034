@@ -29,7 +29,7 @@
 - [AC-12] Frontend implements all 4 required screen states (loading, empty, error, success).
 
 ## Spec vs Result Note
-The implementation successfully adhered to all core specifications, incorporating robust AI error fallbacks and strict service-layer authorization. The agent implemented all planned layers successfully.
+The implementation successfully adhered to all core specifications, incorporating robust AI error fallbacks and strict service-layer authorization. The agent implemented all planned layers successfully without missing any core features.
 
 ## Project Option & Model Feature
 - **Project Option:** club events
@@ -44,8 +44,8 @@ The implementation successfully adhered to all core specifications, incorporatin
 | cancel_registration | Cancels an existing user event registration in the system database. |
 
 ## Local Sign-in, Provider & Account Linking
-- **Local Sign-in:** email and password, hashed securely using bcrypt.
-- **Provider:** at least one social provider such as Google OAuth.
+- **Local Sign-in:** email and password, hashed securely.
+- **Provider:** at least one social provider, such as Google OAuth.
 - **Account Linking:** what happens when the same person signs in both ways is merging the accounts via verified institutional email.
 
 ## UI Section
