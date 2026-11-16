@@ -35,10 +35,13 @@ The agent missed nothing and successfully implemented all layers, reinterpreting
 club events
 
 ## Model Feature
-The model is gemini-2.5-flash. The input is raw event description text. The output is a JSON object containing title and allowed tags. When it fails, it falls back to default static category tags.
+- model: gemini-2.5-flash
+- input: raw event description text
+- output: JSON object containing title and allowed tags
+- what happens when it fails: falls back to default static category tags
 
 ## Failure Plan
-When the provider is slow, rate-limited, or wrong, what does a user see when the provider is slow, rate-limited or wrong? The user sees a graceful warning alert banner on the UI with default fallback content.
+- what does a user see when the provider is slow, rate-limited or wrong?: The user sees a graceful warning alert banner on the UI with default fallback content.
 
 ## MCP Tools
 | Tool | Description |
@@ -48,13 +51,13 @@ When the provider is slow, rate-limited, or wrong, what does a user see when the
 | cancel_registration | Cancels an existing user event registration in the system database with ownership security checks. |
 
 ## Local Sign-in
-email and password, hashed
+- email and password, hashed
 
 ## Provider
-at least one social provider
+- at least one social provider
 
 ## Account Linking
-what happens when the same person signs in both ways? Accounts are linked and merged via verified institutional email address.
+- what happens when the same person signs in both ways?: Accounts are linked and merged via verified institutional email address.
 
 ## UI
 Stack: vanilla HTML, CSS with design tokens, and JavaScript. Screens: loading, empty, error, and success states in public/index.html.
