@@ -1,61 +1,62 @@
-# <Project name>
-
-<!-- Exercise 2. Write the non-goals first. Every acceptance criterion must be checkable in under a minute.
-     Keep these headings exactly as they are: the self-checks look for them by name.
-     The full target is on the course site under Resources → The course project. -->
+# Club Events Management System
 
 ## Project option
-<!-- One line: lab booking, study groups, club events, or the own project the lecturer approved. -->
+club events
 
 ## Goals
+- Provide a web application where student clubs publish capacity-limited events and students register, browse, and cancel registrations.
+- Expose a secure REST API between frontend and backend backed by a PostgreSQL relational database with numbered migrations.
+- Support dual sign-in (local email/password with bcrypt hashing and Google OAuth) syncing to a single user account via verified emails.
+- Implement an AI text-model feature using Google Gemini to generate event titles, summaries, and allowlist tags from rough notes, with a strict timeout and deterministic fallback.
+- Provide a custom MCP server over the project data with at least 5 tools mapped to the same service layer as the REST routes.
+- Deliver a fully responsive UI adhering to design tokens, covering all 4 screen states (loading, empty, error, success), and supporting keyboard navigation.
+- Maintain at least 80% automated test coverage with full `[AC-X]` test ID traceability.
 
 ## Non-goals
+- Complex role management (co-organizers, waitlists, multi-level permissions).
+- Real-time chat, WebSockets, or automated email notifications.
+- Poster image uploads or multi-modal vision processing.
 
 ## Constraints
+- All database schema changes must be delivered as numbered SQL migrations.
+- Authorization checks (ownership of clubs and registrations) must live entirely in the service layer.
+- Model output must be strictly validated against a fixed tag allowlist.
+- Secrets (API keys, client secrets) must never be committed to the repository.
 
 ## The model feature
-<!-- Which model, which modality, and what it does for a user.
-     Name three things or the check fails: the input it receives, the output it produces,
-     and what happens when the model is slow, rate-limited or wrong. -->
-- Model:
-- Input:
-- Output:
-- When it fails:
+- **Model:** Google Gemini API (`gemini-2.5-flash`).
+- **Input:** A rough one-line event idea typed by an organizer (e.g., `"rust workshop next Thursday in room 204"`).
+- **Output:** A structured JSON object containing a clean `title`, a 2-sentence `summary`, and up to 3 category tags.
+- **Fallback & Error Handling:** Enforces a 4-second timeout. If the API key is missing, rate-limited (`429`), or times out, the service falls back gracefully: uses the raw input as the title, sets summary to empty, assigns `["general"]` tags, and flags `fallbackUsed: true` without failing the request.
+- **Data Privacy:** Only the organizer's draft text and allowed tag strings are sent to the Gemini API. No user emails, passwords, or personal data leave the server.
 
 ## Auth
-<!-- Local sign-in plus at least one provider. Say how an account signing in both ways stays one account. -->
-- Local:
-- Provider:
-- Linking:
+- Local authentication via email and password hash (bcrypt).
+- Social authentication via Google OAuth 2.0. Accounts are linked on verified email addresses only.
 
 ## MCP tools
-<!-- At least three tools your own MCP server exposes over this project's data.
-     Each tool calls the same service functions the HTTP API calls, so the same rules apply.
-     A description shorter than 20 characters is not a description. -->
-| Tool | What it does | Who may call it |
-| --- | --- | --- |
-|  |  |  |
+1. `upcoming_events` — List all upcoming club events with remaining seat counts, dates, locations, and tags.
+2. `my_registrations` — List all events the currently authenticated student is registered to attend.
+3. `register_for_event` — Register the authenticated student for a specific upcoming club event by its event ID.
+4. `cancel_registration` — Cancel the authenticated student's existing registration for a specific event ID.
+5. `draft_event_copy` — Generate a clean title, summary, and category tags from a short one-line event idea.
 
 ## UI
-<!-- Stack, and the three or more screens. The graded checklist lives in docs/UI.md. -->
-
-## Architecture
-<!-- Exercise 3. One request traced through every layer, naming the file for each one,
-     plus one place where your own code does not match this layering. -->
+- Built with design tokens for colors, spacing, typography, and border radius.
+- Fully responsive across 380px, 768px, and 1280px viewports with zero horizontal scrolling.
+- Every screen handles loading, empty, error (readable sentences), and success states.
+- Fully navigable via keyboard with visible focus outlines and minimum 4.5:1 text contrast.
 
 ## Acceptance criteria
-<!-- Every criterion carries an id. A test proves it by naming that id in its title, for example
-     test('AC-3 a booking that overlaps another is refused with 409', ...).
-     Say who acts, what they see, and what must be true in the database. -->
-- [AC-1] <example> A member who signs up for an event with no free places sees "This event is full", and no new row appears in `registrations`.
-
-### Slice 1: sign-in and <list screen>
-
-## Traceability
-<!-- Filled in from Exercise 3 onward: each AC id, and the test that names it. -->
-| Criterion | Test |
-| --- | --- |
-| AC-1 |  |
-
-## Spec vs result
-<!-- After the agent builds the slice: which criteria passed, which it missed or reinterpreted, and what you changed in this spec because of it. -->
+- [AC-1] User can register locally with email and password; password is stored as a bcrypt hash.
+- [AC-2] User can sign in with local credentials and receive a valid session.
+- [AC-3] Signing in via Google OAuth with a verified email links to the existing user account.
+- [AC-4] Google OAuth sign-in is rejected with 403 if email is unverified.
+- [AC-5] Only the club organizer can create, update, or delete events for that club.
+- [AC-6] Authenticated user can register for an upcoming event with open capacity.
+- [AC-7] Registering for an event at full capacity is rejected with 409 Conflict.
+- [AC-8] Registering twice for the same event is rejected with 409 Conflict.
+- [AC-9] User can cancel their own registration, freeing a seat.
+- [AC-10] AI event draft generator returns validated title, summary, and allowed tags.
+- [AC-11] AI event draft generator enforces timeout and fallback without throwing errors.
+- [AC-12] MCP tools execute through the same service layer and enforce session authorization.
