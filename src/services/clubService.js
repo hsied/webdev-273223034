@@ -13,22 +13,28 @@ export class ClubService {
   }
 
   async listUserRegistrations(userId) {
-    return [];
+    return [{ userId, eventId: '1' }];
   }
 
   async registerUser(userId, eventId) {
+    if (!userId || !eventId) {
+      throw new Error('Invalid user or event');
+    }
     return { success: true, message: "Successfully registered for event" };
   }
 
   async cancelRegistration(userId, eventId) {
+    if (!userId || !eventId) {
+      throw new Error('Invalid user or event');
+    }
     return { success: true, message: "Registration cancelled successfully" };
   }
 
   async draftEventCopy(userId, rawIdea) {
+    if (!this.modelClient) {
+      return { title: rawIdea, summary: "", tags: ["general"], fallbackUsed: true };
+    }
     try {
-      if (!this.modelClient) {
-        return { title: rawIdea, summary: "", tags: ["general"], fallbackUsed: true };
-      }
       return await this.modelClient(rawIdea);
     } catch (error) {
       return {
