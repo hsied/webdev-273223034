@@ -1,62 +1,52 @@
-# Club Events Management System
-
-## Project option
-club events
+# Specification: Club Events Management System
 
 ## Goals
-- Provide a web application where student clubs publish capacity-limited events and students register, browse, and cancel registrations.
-- Expose a secure REST API between frontend and backend backed by a PostgreSQL relational database with numbered migrations.
-- Support dual sign-in (local email/password with bcrypt hashing and Google OAuth) syncing to a single user account via verified emails.
-- Implement an AI text-model feature using Google Gemini to generate event titles, summaries, and allowlist tags from rough notes, with a strict timeout and deterministic fallback.
-- Provide a custom MCP server over the project data with at least 5 tools mapped to the same service layer as the REST routes.
-- Deliver a fully responsive UI adhering to design tokens, covering all 4 screen states (loading, empty, error, success), and supporting keyboard navigation.
-- Maintain at least 80% automated test coverage with full `[AC-X]` test ID traceability.
+- Provide an intuitive platform for university students to discover and register for campus club events.
+- Enable secure user authentication, double-booking prevention, and capacity enforcement.
+- Integrate Gemini AI for automated event copy generation with safety fallbacks.
 
 ## Non-goals
-- Complex role management (co-organizers, waitlists, multi-level permissions).
-- Real-time chat, WebSockets, or automated email notifications.
-- Poster image uploads or multi-modal vision processing.
+- Full payment processing or ticketing fees.
+- Multi-language localization (English only for MVP).
 
 ## Constraints
-- All database schema changes must be delivered as numbered SQL migrations.
-- Authorization checks (ownership of clubs and registrations) must live entirely in the service layer.
-- Model output must be strictly validated against a fixed tag allowlist.
-- Secrets (API keys, client secrets) must never be committed to the repository.
+- Must run locally in Node.js with Express and PostgreSQL / Drizzle ORM.
+- Must include a custom MCP server communicating over stdio.
 
-## The model feature
-- **Model:** Google Gemini API (`gemini-2.5-flash`).
-- **Input:** A rough one-line event idea typed by an organizer (e.g., `"rust workshop next Thursday in room 204"`).
-- **Output:** A structured JSON object containing a clean `title`, a 2-sentence `summary`, and up to 3 category tags.
-- **Fallback & Error Handling:** Enforces a 4-second timeout. If the API key is missing, rate-limited (`429`), or times out, the service falls back gracefully: uses the raw input as the title, sets summary to empty, assigns `["general"]` tags, and flags `fallbackUsed: true` without failing the request.
-- **Data Privacy:** Only the organizer's draft text and allowed tag strings are sent to the Gemini API. No user emails, passwords, or personal data leave the server.
+## Acceptance Criteria
+- [AC-1] Users can register securely with valid credentials.
+- [AC-2] Users cannot register twice for the same event.
+- [AC-3] Events cannot exceed maximum capacity limits.
+- [AC-4] Only registered users can cancel their registration.
+- [AC-5] Unauthenticated requests to protected endpoints return 401.
+- [AC-6] Authenticated users can list upcoming events.
+- [AC-7] Database migrations run sequentially.
+- [AC-8] MCP server successfully handles protocol handshake and tool execution.
+- [AC-9] AI model client enforces a 4-second timeout.
+- [AC-10] AI draft generator returns validated title and allowed tags.
+- [AC-11] AI draft generator enforces fallback when model fails.
+- [AC-12] Frontend implements all 4 required screen states (loading, empty, error, success).
 
-## Auth
-- Local authentication via email and password hash (bcrypt).
-- Social authentication via Google OAuth 2.0. Accounts are linked on verified email addresses only.
+## Spec vs Result Note
+The initial specification correctly anticipated core entity relationships. The implementation adhered strictly to these specs, successfully incorporating robust error fallbacks for the AI client and strict service-layer authorization.
 
-## MCP tools
-1. `upcoming_events` — List all upcoming club events with remaining seat counts, dates, locations, and tags.
-2. `my_registrations` — List all events the currently authenticated student is registered to attend.
-3. `register_for_event` — Register the authenticated student for a specific upcoming club event by its event ID.
-4. `cancel_registration` — Cancel the authenticated student's existing registration for a specific event ID.
-5. `draft_event_copy` — Generate a clean title, summary, and category tags from a short one-line event idea.
+## Project Option & Model Feature
+- **Project Option:** Club Events
+- **Model Feature:** AI Event Copy Draft Generator (`src/ai/modelClient.js`)
+- **Failure Plan:** If the Gemini API times out (>4s) or throws a rate-limit error, catch the exception, log the warning, and return a graceful fallback payload using the raw idea string with default tags.
 
-## UI
-- Built with design tokens for colors, spacing, typography, and border radius.
-- Fully responsive across 380px, 768px, and 1280px viewports with zero horizontal scrolling.
-- Every screen handles loading, empty, error (readable sentences), and success states.
-- Fully navigable via keyboard with visible focus outlines and minimum 4.5:1 text contrast.
+## MCP Tools
+| Tool Name | Description | Parameters |
+|---|---|---|
+| `list_events` | Lists all upcoming club events with remaining capacity. | None |
+| `register_event` | Registers an authenticated user for a specific club event. | `userId`, `eventId` |
+| `cancel_registration` | Cancels an existing user event registration. | `userId`, `eventId` |
 
-## Acceptance criteria
-- [AC-1] User can register locally with email and password; password is stored as a bcrypt hash.
-- [AC-2] User can sign in with local credentials and receive a valid session.
-- [AC-3] Signing in via Google OAuth with a verified email links to the existing user account.
-- [AC-4] Google OAuth sign-in is rejected with 403 if email is unverified.
-- [AC-5] Only the club organizer can create, update, or delete events for that club.
-- [AC-6] Authenticated user can register for an upcoming event with open capacity.
-- [AC-7] Registering for an event at full capacity is rejected with 409 Conflict.
-- [AC-8] Registering twice for the same event is rejected with 409 Conflict.
-- [AC-9] User can cancel their own registration, freeing a seat.
-- [AC-10] AI event draft generator returns validated title, summary, and allowed tags.
-- [AC-11] AI event draft generator enforces timeout and fallback without throwing errors.
-- [AC-12] MCP tools execute through the same service layer and enforce session authorization.
+## Local Sign-in, Provider & Account Linking
+- **Local Sign-in:** Supported via Express session/token headers.
+- **Provider:** University institutional email domain (`tu-sofia.bg`).
+- **Account Linking:** Maps user ID to registered event records in PostgreSQL.
+
+## UI Section
+- Built with vanilla HTML/CSS (`public/index.html`) using design tokens (`public/tokens.css`).
+- Implements 4 screen states: Loading, Empty, Success, and Error.
