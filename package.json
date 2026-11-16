@@ -1,0 +1,19 @@
+{
+  "name": "club-events",
+  "version": "1.0.0",
+  "description": "Club Events Management System",
+  "main": "src/server.js",
+  "scripts": {
+    "dev": "node src/server.js",
+    "mcp": "node mcp-server/server.js",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "latest",
+    "express": "^4.19.2",
+    "@google/genai": "latest"
+  },
+  "devDependencies": {
+    "vitest": "^1.6.0"
+  }
+}
